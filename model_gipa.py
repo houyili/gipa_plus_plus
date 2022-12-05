@@ -5,7 +5,18 @@ from dgl import function as fn
 from dgl.ops import edge_softmax
 from dgl.utils import expand_as_pair
 
-from utils import get_act_by_str
+def get_act_by_str(name:str, negative_slope:float=0):
+    if name == "leaky_relu":
+        res = nn.LeakyReLU(negative_slope, inplace=True)
+    elif name == "tanh":
+        res = nn.Tanh()
+    elif name == "none":
+        res = nn.Identity()
+    elif name == "relu":
+        res = nn.ReLU()
+    else:
+        res = nn.Softplus()
+    return res
 
 class GIPAConv(nn.Module):
     def __init__(
