@@ -16,7 +16,7 @@ python -u ../train_gipa.py \
     --edge-att-act "none" \
     --norm none \
     --edge-emb-size 16\
-    --gpu 1 \
-    --seed 3 \
-    --n-runs
-    --log-file-name="default_run"
+    --gpu 2 \
+    --seed 5 \
+    --n-runs 2 \
+    --log-file-name="default_run2"
