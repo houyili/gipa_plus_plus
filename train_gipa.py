@@ -13,7 +13,7 @@ import torch.optim as optim
 from torch import nn
 
 from data_loader import load_data, preprocess
-from sampler import random_subgraph
+from graph_sampler import random_subgraph
 from tools import count_model_parameters, print_msg_and_write, seed, get_model
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
