@@ -17,4 +17,4 @@ python -u ../train_gipa.py \
     --norm none \
     --edge-emb-size 16\
     --gpu 0 \
-    --log-file-name="default_run"
+    --log-file-name="train_gipa_l6"
