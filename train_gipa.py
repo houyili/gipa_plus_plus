@@ -129,6 +129,7 @@ def main():
     global device, n_node_feats, n_edge_feats, n_classes
 
     argparser = argparse.ArgumentParser()
+    argparser.add_argument("--model", type=str, default="gipa_simple", choices=["gipa_simple", "test"])
     argparser.add_argument("--root", type=str, default="/data/ogb/datasets/")
     argparser.add_argument("--cpu", action="store_true", help="CPU mode. This option overrides '--gpu'.")
     argparser.add_argument("--gpu", type=int, default=0, help="GPU device ID")
