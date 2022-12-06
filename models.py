@@ -5,9 +5,8 @@ import torch.nn.functional as F
 from dgl import function as fn
 from dgl.ops import edge_softmax
 from dgl.utils import expand_as_pair
-from torch.nn.modules.dropout import Dropout
 
-from utils import get_act_by_str
+from model_gipa import get_act_by_str
 
 
 class GATConv(nn.Module):
