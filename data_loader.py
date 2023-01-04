@@ -1,5 +1,6 @@
 import torch
 import dgl.function as fn
+from torch.nn.functional import one_hot
 from ogb.nodeproppred import DglNodePropPredDataset, Evaluator
 
 def compute_norm(graph):
@@ -26,8 +27,12 @@ def load_data(dataset, root_path):
           f"Test nodes: {len(test_idx)}")
     return graph, labels, train_idx, val_idx, test_idx, evaluator
 
-def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=True, user_avg=True):
+def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=False, use_sparse=False):
     # The sum of the weights of adjacent edges is used as node features.
+    if use_sparse:
+        # graph.edata.update({"sparse": (graph.edata['feat'] * 1000).int()})
+        graph.edata.update({"sparse": one_hot((graph.edata['feat'][:,1] * 100).long())})
+
     if edge_agg_as_feat:
         graph.update_all(fn.copy_e("feat", "feat_copy"), fn.sum("feat_copy", "feat"))
 
