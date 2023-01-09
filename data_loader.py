@@ -25,6 +25,7 @@ def transform_edge_feature_to_sparse(raw_edge_fea):
             print(one_hot.size())
             edge_fea_list.append(one_hot * torch.reshape(possible, [-1, 1]))
     sparse = torch.concat(edge_fea_list, dim=-1)
+    print(sparse.size())
     return sparse
 
 def compute_norm(graph):
@@ -59,6 +60,7 @@ def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=Fa
         edge_sparse = transform_edge_feature_to_sparse(graph.edata['feat'])
         graph.edata.update({"sparse": edge_sparse})
         graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.sum("sparse_c", "sparse"))
+        del graph.edata["sparse"]
 
     if edge_agg_as_feat:
         graph.update_all(fn.copy_e("feat", "feat_copy"), fn.sum("feat_copy", "feat"))
