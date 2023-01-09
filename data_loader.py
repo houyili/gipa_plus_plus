@@ -7,8 +7,8 @@ from ogb.nodeproppred import DglNodePropPredDataset, Evaluator
 def transform_edge_feature_to_sparse(raw_edge_fea):
     edge_fea_list = []
     for i in range(8):
+        print("Process edge feature == %d " %i)
         print(raw_edge_fea[:, i].size())
-
         if i == 0:
             for value in [0.0010, 0.5010]:
                 res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
