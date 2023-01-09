@@ -1,12 +1,14 @@
 import torch
 import dgl.function as fn
-from torch.nn.functional import one_hot
+from torch.nn import functional
 from ogb.nodeproppred import DglNodePropPredDataset, Evaluator
 
 
 def transform_edge_feature_to_sparse(raw_edge_fea):
     edge_fea_list = []
     for i in range(8):
+        print(raw_edge_fea[:, i].size())
+
         if i == 0:
             for value in [0.0010, 0.5010]:
                 res = (raw_edge_fea[:, i] == value).float()
@@ -16,11 +18,12 @@ def transform_edge_feature_to_sparse(raw_edge_fea):
                 res = (raw_edge_fea[:, i] == value).float()
                 edge_fea_list.append(res if value == 0.001 else res * raw_edge_fea[:, i])
         else:
-            impossible = (raw_edge_fea[:, i] == 0.0010).float()
-            possible = (raw_edge_fea[:, i] != 0.0010).float()
-            res = one_hot((raw_edge_fea[:, i] * 100).long()).float() * possible * raw_edge_fea[:, i]
-            edge_fea_list.append(impossible)
-            edge_fea_list.append(res)
+            edge_fea_list.append((raw_edge_fea[:, i] == 0.0010).float())
+            possible = (raw_edge_fea[:, i] != 0.0010).float() * raw_edge_fea[:, i]
+            print(possible.size())
+            one_hot = functional.one_hot((raw_edge_fea[:, i] * 30).long()).float()
+            print(one_hot.size())
+            edge_fea_list.append(possible * one_hot)
     sparse = torch.concat(edge_fea_list, dim=-1)
     return sparse
 
