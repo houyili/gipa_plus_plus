@@ -49,7 +49,9 @@ def get_model(args, n_node_feats, n_edge_feats, n_classes):
             use_attn_dst=not args.no_attn_dst,
             norm=args.norm,
             batch_norm=not args.disable_fea_trans_norm,
-            edge_att_act=args.edge_att_act, edge_agg_mode=args.edge_agg_mode
+            edge_att_act=args.edge_att_act,
+            edge_agg_mode=args.edge_agg_mode,
+            use_node_sparse = args.use_sparse_fea
         )
     else:
         model = AGDN_SM(

@@ -179,12 +179,14 @@ class GIPA_SIMPLE(nn.Module):
             batch_norm=True,
             edge_att_act="leaky_relu",
             edge_agg_mode="none_softmax",
-            first_hidden = 150
+            first_hidden = 150,
+            use_node_sparse = False
     ):
         super().__init__()
         self.n_layers = n_layers
         self.n_hidden = n_hidden
         self.n_classes = n_classes
+        self._use_node_sparse = use_node_sparse
 
         self.convs = nn.ModuleList()
         self.norms = nn.ModuleList()
@@ -233,7 +235,7 @@ class GIPA_SIMPLE(nn.Module):
         else:
             subgraphs = g
 
-        h = subgraphs[0].srcdata["feat"]
+        h =  subgraphs[0].srcdata["sparse"] if self._use_node_sparse else subgraphs[0].srcdata["feat"]
 
 
         h = self.node_encoder(h)

@@ -8,7 +8,7 @@ def transform_edge_feature_to_sparse(raw_edge_fea):
     edge_fea_list = []
     for i in range(8):
         print("Process edge feature == %d " %i)
-        print(raw_edge_fea[:, i].size())
+        print("The edge feature size ", raw_edge_fea[:, i].size())
         if i == 0:
             for value in [0.0010, 0.5010]:
                 res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
@@ -20,9 +20,9 @@ def transform_edge_feature_to_sparse(raw_edge_fea):
         else:
             edge_fea_list.append(torch.reshape((raw_edge_fea[:, i] == 0.0010).float(), [-1, 1]))
             possible = (raw_edge_fea[:, i] != 0.0010).float() * raw_edge_fea[:, i]
-            print(possible.size())
+            print("The edge possible size ", possible.size())
             one_hot = functional.one_hot((raw_edge_fea[:, i] * 30).long()).float()
-            print(one_hot.size())
+            print("The edge one hot size ", one_hot.size())
             edge_fea_list.append(one_hot * torch.reshape(possible, [-1, 1]))
     sparse = torch.concat(edge_fea_list, dim=-1)
     print(sparse.size())

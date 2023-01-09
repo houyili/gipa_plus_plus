@@ -161,6 +161,7 @@ def main():
     argparser.add_argument("--first-hidden", type=int, default=150, help="first layer size")
     argparser.add_argument("--edge-emb-size", type=int, default=16)
     argparser.add_argument("--wd", type=float, default=0, help="weight decay")
+    argparser.add_argument("--use-sparse-fea", action="store_true")
     args = argparser.parse_args()
     print(args)
 
@@ -173,8 +174,9 @@ def main():
     print("Loading data......")
     graph, labels, train_idx, val_idx, test_idx, evaluator = load_data(dataset, args.root)
     print("Preprocessing......")
-    graph, labels = preprocess(graph, labels, user_adj=args.norm=="adj", user_avg=args.norm=="avg")
-    n_node_feats = graph.ndata["feat"].shape[-1]
+    graph, labels = preprocess(graph, labels, user_adj=args.norm=="adj", user_avg=args.norm=="avg",
+                               use_sparse=args.use_sparse_fea)
+    n_node_feats = graph.ndata["sparse"].shape[-1] if args.use_sparse_fea else graph.ndata["feat"].shape[-1]
 
     labels, train_idx, val_idx, test_idx = map(lambda x: x.to(device), (labels, train_idx, val_idx, test_idx))
 
