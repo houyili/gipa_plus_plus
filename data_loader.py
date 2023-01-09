@@ -3,6 +3,27 @@ import dgl.function as fn
 from torch.nn.functional import one_hot
 from ogb.nodeproppred import DglNodePropPredDataset, Evaluator
 
+
+def transform_edge_feature_to_sparse(raw_edge_fea):
+    edge_fea_list = []
+    for i in range(8):
+        if i == 0:
+            for value in [0.0010, 0.5010]:
+                res = (raw_edge_fea[:, i] == value).float()
+                edge_fea_list.append(res if value == 0.001 else res * raw_edge_fea[:, i])
+        elif i == 6:
+            for value in [0.0010, 0.9010, 0.6010, 0.6510, 0.5410]:
+                res = (raw_edge_fea[:, i] == value).float()
+                edge_fea_list.append(res if value == 0.001 else res * raw_edge_fea[:, i])
+        else:
+            impossible = (raw_edge_fea[:, i] == 0.0010).float()
+            possible = (raw_edge_fea[:, i] != 0.0010).float()
+            res = one_hot((raw_edge_fea[:, i] * 30).long()).float() * possible * raw_edge_fea[:, i]
+            edge_fea_list.append(impossible)
+            edge_fea_list.append(res)
+    sparse = torch.concat(edge_fea_list, dim=-1)
+    return sparse
+
 def compute_norm(graph):
     degs = graph.in_degrees().float().clamp(min=1)
     deg_isqrt = torch.pow(degs, -0.5)
@@ -31,7 +52,10 @@ def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=Fa
     # The sum of the weights of adjacent edges is used as node features.
     if use_sparse:
         # graph.edata.update({"sparse": (graph.edata['feat'] * 1000).int()})
-        graph.edata.update({"sparse": one_hot((graph.edata['feat'][:,1] * 100).long())})
+        # graph.edata.update({"sparse": one_hot((graph.edata['feat'][:,1] * 100).long())})
+        edge_sparse = transform_edge_feature_to_sparse(graph.edata['feat'])
+        graph.edata.update({"sparse": edge_sparse})
+        graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.sum("sparse_c", "sparse"))
 
     if edge_agg_as_feat:
         graph.update_all(fn.copy_e("feat", "feat_copy"), fn.sum("feat_copy", "feat"))
