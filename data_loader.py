@@ -23,7 +23,7 @@ def transform_edge_feature_to_sparse(raw_edge_fea):
             print(possible.size())
             one_hot = functional.one_hot((raw_edge_fea[:, i] * 30).long()).float()
             print(one_hot.size())
-            edge_fea_list.append(possible * one_hot)
+            edge_fea_list.append(one_hot*torch.reshape(possible, [-1, 1]))
     sparse = torch.concat(edge_fea_list, dim=-1)
     return sparse
 
