@@ -11,19 +11,19 @@ def transform_edge_feature_to_sparse(raw_edge_fea):
 
         if i == 0:
             for value in [0.0010, 0.5010]:
-                res = (raw_edge_fea[:, i] == value).float()
+                res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
                 edge_fea_list.append(res if value == 0.001 else res * raw_edge_fea[:, i])
         elif i == 6:
             for value in [0.0010, 0.9010, 0.6010, 0.6510, 0.5410]:
-                res = (raw_edge_fea[:, i] == value).float()
+                res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
                 edge_fea_list.append(res if value == 0.001 else res * raw_edge_fea[:, i])
         else:
-            edge_fea_list.append((raw_edge_fea[:, i] == 0.0010).float())
+            edge_fea_list.append(torch.reshape((raw_edge_fea[:, i] == 0.0010).float(), [-1, 1]))
             possible = (raw_edge_fea[:, i] != 0.0010).float() * raw_edge_fea[:, i]
             print(possible.size())
             one_hot = functional.one_hot((raw_edge_fea[:, i] * 30).long()).float()
             print(one_hot.size())
-            edge_fea_list.append(one_hot*torch.reshape(possible, [-1, 1]))
+            edge_fea_list.append(one_hot * torch.reshape(possible, [-1, 1]))
     sparse = torch.concat(edge_fea_list, dim=-1)
     return sparse
 
