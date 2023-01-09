@@ -18,7 +18,7 @@ def transform_edge_feature_to_sparse(raw_edge_fea):
         else:
             impossible = (raw_edge_fea[:, i] == 0.0010).float()
             possible = (raw_edge_fea[:, i] != 0.0010).float()
-            res = one_hot((raw_edge_fea[:, i] * 30).long()).float() * possible * raw_edge_fea[:, i]
+            res = one_hot((raw_edge_fea[:, i] * 100).long()).float() * possible * raw_edge_fea[:, i]
             edge_fea_list.append(impossible)
             edge_fea_list.append(res)
     sparse = torch.concat(edge_fea_list, dim=-1)
