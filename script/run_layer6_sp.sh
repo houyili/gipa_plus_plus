@@ -17,6 +17,6 @@ python -u ../train_gipa.py \
     --norm none \
     --edge-emb-size 16\
     --gpu 0 \
-    --first-hidden 300 \
+    --first-hidden 500 \
     --use-sparse-fea \
     --log-file-name="train_gipa_layer6_sparse"
