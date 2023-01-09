@@ -1,5 +1,3 @@
-import torch
-import dgl
 from data_loader import load_data, preprocess
 
 root_path = "/Users/lihouyi/Documents/opensource/data_source/proteins"

@@ -3,9 +3,9 @@ import torch
 import numpy as np
 import dgl
 
-from model_gipa import GIPA_SIMPLE
-import torch.nn.functional as F
 
+import torch.nn.functional as F
+from model_gipa import GIPA_SIMPLE
 from new_models import GIPASMConv, AGDN_SM
 
 
