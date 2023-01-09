@@ -12,11 +12,11 @@ def transform_edge_feature_to_sparse(raw_edge_fea):
         if i == 0:
             for value in [0.0010, 0.5010]:
                 res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
-                edge_fea_list.append(res if value == 0.001 else res * raw_edge_fea[:, i])
+                edge_fea_list.append(res if value == 0.001 else res * torch.reshape(raw_edge_fea[:, i], [-1,1]))
         elif i == 6:
             for value in [0.0010, 0.9010, 0.6010, 0.6510, 0.5410]:
                 res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
-                edge_fea_list.append(res if value == 0.001 else res * raw_edge_fea[:, i])
+                edge_fea_list.append(res if value == 0.001 else res * torch.reshape(raw_edge_fea[:, i], [-1,1]))
         else:
             edge_fea_list.append(torch.reshape((raw_edge_fea[:, i] == 0.0010).float(), [-1, 1]))
             possible = (raw_edge_fea[:, i] != 0.0010).float() * raw_edge_fea[:, i]
