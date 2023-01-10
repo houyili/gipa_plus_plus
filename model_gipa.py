@@ -248,7 +248,7 @@ class GIPA_WIDE(nn.Module):
         if self.input_drop is not None:
             h = self.input_drop(h)
         h = self.first_layer_act(self.node_encoder(h))
-        if self.self.first_layer_norm is not None:
+        if self.first_layer_norm is not None:
             h = self.first_layer_norm(h)
         h = self.first_layer_drop(h)
 
