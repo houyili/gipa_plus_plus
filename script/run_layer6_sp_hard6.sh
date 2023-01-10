@@ -16,7 +16,7 @@ python -u ../train_gipa.py \
     --edge-att-act "none" \
     --norm none \
     --edge-emb-size 16\
-    --gpu 3 \
+    --gpu 0 \
     --first-hidden 200 \
     --use-sparse-fea \
     --sparse-encoder "hard_30" \
