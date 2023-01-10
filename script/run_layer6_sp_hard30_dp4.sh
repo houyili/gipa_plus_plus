@@ -20,4 +20,4 @@ python -u ../train_gipa.py \
     --first-hidden 500 \
     --use-sparse-fea \
     --sparse-encoder "hard_30" \
-    --log-file-name="train_gipa_layer6_sparse_hard_30"
+    --log-file-name="train_gipa_layer6_sparse_hard_30_dp40"
