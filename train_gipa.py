@@ -163,7 +163,7 @@ def main():
     argparser.add_argument("--use-sparse-fea", action="store_true")
     argparser.add_argument("--sparse-encoder", type=str, default="")
     argparser.add_argument("--input-norm", action="store_true")
-    argparser.add_argument("--first-layer-act", type=str, default="leaky_relu", choices=act_set)
+    argparser.add_argument("--first-layer-act", type=str, default="relu", choices=act_set)
     argparser.add_argument("--feature-drop", type=float, default=0.0, help="raw feature drop rate")
 
     args = argparser.parse_args()
