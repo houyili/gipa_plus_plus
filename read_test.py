@@ -14,7 +14,6 @@ for id in [train_idx, val_idx, test_idx]:
     str = ""
     for i in range(len(sparse)):
         str = str + "%.03f, " %sparse[i]
-    print(str)
     for i in range(len(dense)):
         str = str + ", %.03f" % dense[i]
     print(str)
