@@ -179,8 +179,11 @@ class GIPA_WIDE(nn.Module):
             batch_norm=True,
             edge_att_act="leaky_relu",
             edge_agg_mode="none_softmax",
+            use_node_sparse = False,
+            input_norm = False,
             first_hidden = 150,
-            use_node_sparse = False
+            first_layer_act = "relu",
+            first_layer_drop = 0.1
     ):
         super().__init__()
         self.n_layers = n_layers
@@ -190,6 +193,7 @@ class GIPA_WIDE(nn.Module):
 
         self.convs = nn.ModuleList()
         self.norms = nn.ModuleList()
+        self.input_norm = nn.BatchNorm1d(first_hidden) if input_norm else None
 
         self.node_encoder = nn.Linear(node_feats, first_hidden)
 
@@ -220,8 +224,9 @@ class GIPA_WIDE(nn.Module):
             self.norms.append(nn.BatchNorm1d(n_heads * out_hidden))
 
         self.pred_linear = nn.Linear(n_heads * n_hidden, n_classes)
-
-        self.input_drop = nn.Dropout(input_drop)
+        self.first_layer_act = get_act_by_str(first_layer_act)
+        self.input_drop = nn.Dropout(input_drop) if input_drop > 0 else None
+        self.first_layer_drop = nn.Dropout(first_layer_drop)
         self.dropout = nn.Dropout(dropout)
         self.activation = activation
         print("The new parameter are %s,%s,%s" % (batch_norm, edge_att_act, edge_agg_mode))
@@ -236,9 +241,13 @@ class GIPA_WIDE(nn.Module):
         h =  subgraphs[0].srcdata["sparse"] if self._use_node_sparse else subgraphs[0].srcdata["feat"]
 
 
+        if self.input_norm is not None:
+            h = self.input_norm(h)
+        if self.input_drop is not None:
+            h = self.input_drop(h)
         h = self.node_encoder(h)
-        h = F.relu(h, inplace=True)
-        h = self.input_drop(h)
+        h = self.first_layer_act(h)
+        h = self.first_layer_drop(h)
 
         h_last = None
 

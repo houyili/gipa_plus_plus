@@ -19,6 +19,7 @@ from tools import count_model_parameters, print_msg_and_write, seed, get_model
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 device = None
 dataset = "ogbn-proteins"
+act_set = ["leaky_relu", "tanh", "softplus", "none", "relu"]
 n_node_feats, n_edge_feats, n_classes = 0, 8, 112
 
 
@@ -144,15 +145,13 @@ def main():
     argparser.add_argument("--n-heads", type=int, default=3, help="number of heads")
     argparser.add_argument("--norm", type=str, default="none", choices=["none", "adj", "avg"])
     argparser.add_argument("--disable-fea-trans-norm", action="store_true", help="disable batch norm in fea trans part")
-    argparser.add_argument("--edge-att-act", type=str, default="leaky_relu",
-                           choices=["leaky_relu", "tanh", "softplus", "none", "relu"])
-    argparser.add_argument("--edge-agg-mode", type=str, default="none_softmax",
-                           choices=["single_softmax", "none_softmax"])
+    argparser.add_argument("--edge-att-act", type=str, default="leaky_relu", choices=act_set)
+    argparser.add_argument("--edge-agg-mode", type=str, default="none_softmax", choices=["single_softmax", "none_softmax"])
     argparser.add_argument("--lr", type=float, default=0.001, help="learning rate")
     argparser.add_argument("--n-layers", type=int, default=6, help="number of layers")
     argparser.add_argument("--n-hidden", type=int, default=80, help="number of hidden units")
     argparser.add_argument("--dropout", type=float, default=0.25, help="dropout rate")
-    argparser.add_argument("--input-drop", type=float, default=0.1, help="input drop rate")
+    argparser.add_argument("--input-drop", type=float, default=0.1, help="input layer drop rate")
     argparser.add_argument("--edge-drop", type=float, default=0.1, help="edge drop rate")
     argparser.add_argument("--eval-every", type=int, default=5, help="evaluate every EVAL_EVERY epochs")
     argparser.add_argument("--log-every", type=int, default=5, help="log every LOG_EVERY epochs")
@@ -163,6 +162,10 @@ def main():
     argparser.add_argument("--wd", type=float, default=0, help="weight decay")
     argparser.add_argument("--use-sparse-fea", action="store_true")
     argparser.add_argument("--sparse-encoder", type=str, default="")
+    argparser.add_argument("--input-norm", action="store_true")
+    argparser.add_argument("--first-layer-act", type=str, default="leaky_relu", choices=act_set)
+    argparser.add_argument("--feature-drop", type=float, default=0.0, help="raw feature drop rate")
+
     args = argparser.parse_args()
     print(args)
 

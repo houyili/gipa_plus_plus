@@ -44,7 +44,7 @@ def get_model(args, n_node_feats, n_edge_feats, n_classes):
             edge_emb = args.edge_emb_size,
             activation = F.relu,
             dropout = args.dropout,
-            input_drop = args.input_drop,
+            input_drop = args.feature_drop,
             edge_drop = args.edge_drop,
             use_attn_dst = not args.no_attn_dst,
             norm = args.norm,
@@ -52,7 +52,10 @@ def get_model(args, n_node_feats, n_edge_feats, n_classes):
             edge_att_act = args.edge_att_act,
             edge_agg_mode = args.edge_agg_mode,
             use_node_sparse = args.use_sparse_fea,
-            first_hidden = args.first_hidden
+            first_hidden = args.first_hidden,
+            input_norm = args.input_norm,
+            first_layer_act = args.first_layer_act,
+            first_layer_drop = args.input_drop
         )
     else:
         model = AGDN_SM(
