@@ -195,7 +195,6 @@ class GIPA_WIDE(nn.Module):
 
         if edge_emb > 0:
             self.edge_encoder = nn.ModuleList()
-            self.edge_norms = nn.ModuleList()
 
         for i in range(n_layers):
             in_hidden =  n_heads * n_hidden if i > 0 else first_hidden
@@ -203,7 +202,6 @@ class GIPA_WIDE(nn.Module):
 
             if edge_emb > 0:
                 self.edge_encoder.append(nn.Linear(edge_feats, edge_emb))
-                self.edge_norms.append(nn.BatchNorm1d(edge_emb))
             self.convs.append(
                 GIPAConv(
                     in_hidden,

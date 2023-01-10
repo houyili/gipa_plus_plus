@@ -178,6 +178,7 @@ def main():
     graph, labels = preprocess(graph, labels, user_adj=args.norm=="adj", user_avg=args.norm=="avg",
                                sparse_encoder=args.sparse_encoder if args.use_sparse_fea else None)
     n_node_feats = graph.ndata["sparse"].shape[-1] if args.use_sparse_fea else graph.ndata["feat"].shape[-1]
+    n_edge_feats = graph.edata["feat"].shape[-1]
 
     labels, train_idx, val_idx, test_idx = map(lambda x: x.to(device), (labels, train_idx, val_idx, test_idx))
 

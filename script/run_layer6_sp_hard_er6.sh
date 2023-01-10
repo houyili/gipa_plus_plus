@@ -16,8 +16,8 @@ python -u ../train_gipa.py \
     --edge-att-act "none" \
     --norm none \
     --edge-emb-size 16\
-    --gpu 2 \
+    --gpu 3 \
     --first-hidden 500 \
     --use-sparse-fea \
-    --sparse-encoder "hard_30" \
-    --log-file-name="train_gipa_layer6_sparse_hard_30"
+    --sparse-encoder "hard_edge_reverse_6" \
+    --log-file-name="train_gipa_layer6_sparse_hard_edge_reverse_6"

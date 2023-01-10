@@ -74,21 +74,20 @@ def load_data(dataset, root_path):
     return graph, labels, train_idx, val_idx, test_idx, evaluator
 
 def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=False, sparse_encoder:str=None):
-    # The sum of the weights of adjacent edges is used as node features.
+    if edge_agg_as_feat:
+        graph.update_all(fn.copy_e("feat", "feat_copy"), fn.sum("feat_copy", "feat"))
+
     if sparse_encoder is not None:
-        # graph.edata.update({"sparse": (graph.edata['feat'] * 1000).int()})
-        # graph.edata.update({"sparse": one_hot((graph.edata['feat'][:,1] * 100).long())})
         if len(sparse_encoder) > 0:
-            edge_sparse = transform_edge_feature_to_sparse2(graph.edata['feat'], int(sparse_encoder.split("_")[1]))
+            edge_sparse = transform_edge_feature_to_sparse2(graph.edata['feat'], int(sparse_encoder.split("_")[-1]))
 
         else:
             edge_sparse = transform_edge_feature_to_sparse(graph.edata['feat'])
         graph.edata.update({"sparse": edge_sparse})
         graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.sum("sparse_c", "sparse"))
+        if sparse_encoder.find("edge_reverse") != -1:
+            graph.edata.update({"feat": edge_sparse})
         del graph.edata["sparse"]
-
-    if edge_agg_as_feat:
-        graph.update_all(fn.copy_e("feat", "feat_copy"), fn.sum("feat_copy", "feat"))
 
     if user_adj or user_avg:
         deg_sqrt, deg_isqrt = compute_norm(graph)
