@@ -193,7 +193,7 @@ class GIPA_WIDE(nn.Module):
 
         self.convs = nn.ModuleList()
         self.norms = nn.ModuleList()
-        self.input_norm = nn.BatchNorm1d(first_hidden) if input_norm else None
+        self.input_norm = nn.BatchNorm1d(node_feats) if input_norm else None
 
         self.node_encoder = nn.Linear(node_feats, first_hidden)
 
