@@ -184,7 +184,8 @@ class GIPA_WIDE(nn.Module):
             first_hidden = 150,
             first_layer_act = "relu",
             first_layer_drop = 0.1,
-            first_layer_norm = False
+            first_layer_norm = False,
+            last_layer_drop = -1
     ):
         super().__init__()
         self.n_layers = n_layers
@@ -230,6 +231,7 @@ class GIPA_WIDE(nn.Module):
         self.input_drop = nn.Dropout(input_drop) if input_drop > 0 else None
         self.first_layer_drop = nn.Dropout(first_layer_drop)
         self.dropout = nn.Dropout(dropout)
+        self.last_layer_drop = nn.Dropout(last_layer_drop if last_layer_drop > 0 else dropout)
         self.activation = activation
         print("The new parameter are %s,%s,%s" % (batch_norm, edge_att_act, edge_agg_mode))
         print("Init %s" % str(self.__class__))
@@ -271,7 +273,7 @@ class GIPA_WIDE(nn.Module):
             h_last = h
             h = self.norms[i](h)
             h = self.activation(h, inplace=True)
-            h = self.dropout(h)
+            h = self.dropout(h) if i < self.n_layers - 1 else self.last_layer_drop(h)
 
         h = self.pred_linear(h)
         return h

@@ -166,6 +166,7 @@ def main():
     argparser.add_argument("--first-layer-norm", action="store_true")
     argparser.add_argument("--first-layer-act", type=str, default="relu", choices=act_set)
     argparser.add_argument("--feature-drop", type=float, default=0.0, help="raw feature drop rate")
+    argparser.add_argument("--last-layer-drop", type=float, default=-1.0, help="last layer drop rate")
 
     args = argparser.parse_args()
     print(args)

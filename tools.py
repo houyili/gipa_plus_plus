@@ -56,7 +56,8 @@ def get_model(args, n_node_feats, n_edge_feats, n_classes):
             input_norm = args.input_norm,
             first_layer_act = args.first_layer_act,
             first_layer_drop = args.input_drop,
-            first_layer_norm = args.first_layer_norm
+            first_layer_norm = args.first_layer_norm,
+            last_layer_drop = args.last_layer_drop
         )
     else:
         model = AGDN_SM(
