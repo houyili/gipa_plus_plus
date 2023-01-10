@@ -183,7 +183,8 @@ class GIPA_WIDE(nn.Module):
             input_norm = False,
             first_hidden = 150,
             first_layer_act = "relu",
-            first_layer_drop = 0.1
+            first_layer_drop = 0.1,
+            first_layer_norm = False
     ):
         super().__init__()
         self.n_layers = n_layers
@@ -194,6 +195,7 @@ class GIPA_WIDE(nn.Module):
         self.convs = nn.ModuleList()
         self.norms = nn.ModuleList()
         self.input_norm = nn.BatchNorm1d(node_feats) if input_norm else None
+        self.first_layer_norm = nn.BatchNorm1d(first_hidden) if first_layer_norm else None
 
         self.node_encoder = nn.Linear(node_feats, first_hidden)
 
@@ -245,8 +247,9 @@ class GIPA_WIDE(nn.Module):
             h = self.input_norm(h)
         if self.input_drop is not None:
             h = self.input_drop(h)
-        h = self.node_encoder(h)
-        h = self.first_layer_act(h)
+        h = self.first_layer_act(self.node_encoder(h))
+        if self.self.first_layer_norm is not None:
+            h = self.first_layer_norm(h)
         h = self.first_layer_drop(h)
 
         h_last = None
