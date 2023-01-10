@@ -10,14 +10,14 @@ python -u ../train_gipa.py \
     --n-layers 6 \
     --dropout 0.4 \
     --n-hidden 50 \
-    --input-drop 0.1 \
+    --input-drop 0.4 \
     --edge-drop 0.1 \
     --edge-agg-mode "single_softmax" \
     --edge-att-act "none" \
     --norm none \
     --edge-emb-size 16\
-    --gpu 0 \
-    --first-hidden 200 \
+    --gpu 1 \
+    --first-hidden 500 \
     --use-sparse-fea \
-    --sparse-encoder "hard_6" \
-    --log-file-name="train_gipa_layer6_sparse_hard_6"
+    --sparse-encoder "hard_30" \
+    --log-file-name="train_gipa_layer6_sparse_hard_30"
