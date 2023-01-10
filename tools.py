@@ -5,7 +5,7 @@ import dgl
 
 
 import torch.nn.functional as F
-from model_gipa import GIPA_SIMPLE
+from model_gipa import GIPA_WIDE
 from new_models import GIPASMConv, AGDN_SM
 
 
@@ -34,7 +34,7 @@ def print_msg_and_write(out_msg, log_f):
 
 def get_model(args, n_node_feats, n_edge_feats, n_classes):
     if args.model == "gipa_simple":
-        model = GIPA_SIMPLE(
+        model = GIPA_WIDE(
             n_node_feats,
             n_edge_feats,
             n_classes,

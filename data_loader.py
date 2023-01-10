@@ -3,8 +3,7 @@ import dgl.function as fn
 from torch.nn import functional
 from ogb.nodeproppred import DglNodePropPredDataset, Evaluator
 
-
-def transform_edge_feature_to_sparse(raw_edge_fea):
+def transform_edge_feature_to_sparse(raw_edge_fea, split_num:int = 30):
     edge_fea_list = []
     for i in range(8):
         print("Process edge feature == %d " %i)
@@ -21,12 +20,35 @@ def transform_edge_feature_to_sparse(raw_edge_fea):
             edge_fea_list.append(torch.reshape((raw_edge_fea[:, i] == 0.0010).float(), [-1, 1]))
             possible = (raw_edge_fea[:, i] != 0.0010).float() * raw_edge_fea[:, i]
             print("The edge possible size ", possible.size())
-            one_hot = functional.one_hot((raw_edge_fea[:, i] * 30).long()).float()
+            one_hot = functional.one_hot((raw_edge_fea[:, i] * split_num).long()).float()
             print("The edge one hot size ", one_hot.size())
             edge_fea_list.append(one_hot * torch.reshape(possible, [-1, 1]))
     sparse = torch.concat(edge_fea_list, dim=-1)
     print(sparse.size())
     return sparse
+
+def transform_edge_feature_to_sparse2(raw_edge_fea, split_num:int = 30):
+    edge_fea_list = []
+    for i in range(8):
+        print("Process edge feature == %d " %i)
+        this_fea = torch.reshape(raw_edge_fea[:, i], [-1,1])
+        print("The edge feature size ", raw_edge_fea[:, i].size(), " transform to ", this_fea.size())
+        if i == 0:
+            for value in [0.0010, 0.5010]:
+                res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
+                edge_fea_list.append(res * this_fea)
+        elif i == 6:
+            for value in [0.0010, 0.9010, 0.6010, 0.6510, 0.5410]:
+                res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
+                edge_fea_list.append(res * this_fea)
+        else:
+            one_hot = functional.one_hot((raw_edge_fea[:, i] * split_num).long()).float()
+            print("The edge one hot size ", one_hot.size())
+            edge_fea_list.append(one_hot * this_fea)
+    sparse = torch.concat(edge_fea_list, dim=-1)
+    print(sparse.size())
+    return sparse
+
 
 def compute_norm(graph):
     degs = graph.in_degrees().float().clamp(min=1)
@@ -36,7 +58,6 @@ def compute_norm(graph):
     deg_sqrt = torch.pow(degs, 0.5)
 
     return deg_sqrt, deg_isqrt
-
 
 def load_data(dataset, root_path):
     data = DglNodePropPredDataset(name=dataset, root=root_path)
@@ -52,12 +73,16 @@ def load_data(dataset, root_path):
           f"Test nodes: {len(test_idx)}")
     return graph, labels, train_idx, val_idx, test_idx, evaluator
 
-def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=False, use_sparse=False):
+def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=False, sparse_encoder:str=None):
     # The sum of the weights of adjacent edges is used as node features.
-    if use_sparse:
+    if sparse_encoder is not None:
         # graph.edata.update({"sparse": (graph.edata['feat'] * 1000).int()})
         # graph.edata.update({"sparse": one_hot((graph.edata['feat'][:,1] * 100).long())})
-        edge_sparse = transform_edge_feature_to_sparse(graph.edata['feat'])
+        if len(sparse_encoder) > 0:
+            edge_sparse = transform_edge_feature_to_sparse2(graph.edata['feat'], int(sparse_encoder.split("_")[1]))
+
+        else:
+            edge_sparse = transform_edge_feature_to_sparse(graph.edata['feat'])
         graph.edata.update({"sparse": edge_sparse})
         graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.sum("sparse_c", "sparse"))
         del graph.edata["sparse"]

@@ -159,7 +159,7 @@ class GIPAConv(nn.Module):
 
             return rst
 
-class GIPA_SIMPLE(nn.Module):
+class GIPA_WIDE(nn.Module):
     def __init__(
             self,
             node_feats,
