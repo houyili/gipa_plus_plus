@@ -11,16 +11,18 @@ graph, labels = preprocess(graph, labels, sparse_encoder="hard_30")
 
 for id in [train_idx, val_idx, test_idx]:
     print(id)
-    sparse = torch.mean(graph.ndata["sparse"][id], dim=-1).tolist()
-    dense = torch.mean(graph.ndata["feat"][id], dim=-1).tolist()
-    str = ""
-    for i in range(len(sparse)):
-        str = str + ", %.03f" %sparse[i]
-    print(str)
-    str = ""
-    for i in range(len(dense)):
-        str = str + ", %.03f" % dense[i]
-    print(str)
+    sparse = torch.mean(graph.ndata["sparse"][id], dim=1)
+    dense = torch.mean(graph.ndata["feat"][id], dim=1)
+    print(sparse.shape)
+    print(dense.shape)
+    # str = ""
+    # for i in range(len(sparse.tolist())):
+    #     str = str + ", %.03f" %sparse[i]
+    # # print(str)
+    # str = ""
+    # for i in range(len(dense.tolist())):
+    #     str = str + ", %.03f" % dense[i]
+    # print(str)
 
 # print(graph.edata["feat"][0])
 # print(graph.edata["sparse"][0])
