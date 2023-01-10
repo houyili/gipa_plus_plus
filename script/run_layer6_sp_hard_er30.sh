@@ -19,5 +19,5 @@ python -u ../train_gipa.py \
     --gpu 3 \
     --first-hidden 500 \
     --use-sparse-fea \
-    --sparse-encoder "hard_edge_reverse_6" \
-    --log-file-name="train_gipa_layer6_sparse_hard_edge_reverse_6"
+    --sparse-encoder "hard_edge_reverse_30" \
+    --log-file-name="train_gipa_layer6_sparse_hard_edge_reverse_30"
