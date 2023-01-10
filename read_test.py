@@ -11,8 +11,8 @@ graph, labels = preprocess(graph, labels, sparse_encoder="hard_30")
 
 for id in [train_idx, val_idx, test_idx]:
     print(id)
-    sparse = torch.mean(graph.ndata["sparse"][id], dim=1)
-    dense = torch.mean(graph.ndata["feat"][id], dim=1)
+    sparse = torch.mean(graph.ndata["sparse"][id], dim=0)
+    dense = torch.mean(graph.ndata["feat"][id], dim=0)
     print(sparse.shape)
     print(dense.shape)
     # str = ""
