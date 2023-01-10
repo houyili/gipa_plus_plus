@@ -4,10 +4,9 @@ from data_loader import load_data, preprocess
 # root_path = "/Users/lihouyi/Documents/opensource/data_source/proteins"
 root_path = "/data/ogb/datasets/"
 dataset = "ogbn-proteins"
-n_node_feats, n_edge_feats, n_classes = 0, 8, 112
 
 graph, labels, train_idx, val_idx, test_idx, evaluator = load_data(dataset, root_path)
-graph, labels = preprocess(graph, labels, sparse_encoder="hard_30")
+graph, labels = preprocess(graph, labels, sparse_encoder="hard_6")
 
 for id in [train_idx, val_idx, test_idx]:
     sparse = torch.mean(graph.ndata["sparse"][id], dim=0).tolist()
