@@ -93,8 +93,14 @@ def transform_edge_feature_to_sparse3(raw_edge_fea, graph, split_num:int = 30):
     del graph.ndata["sparse_f"]
     return sparse
 
-def remove_nonsense_node(node):
-    return {'sparse' : node}
+def remove_nonsense_sparse_fea(node):
+    sp = node["sparse"]
+    val_sp = node["sparse"][107855:]
+    val_sp_max = torch.max(val_sp, dim=1).vaules
+    cond = torch.nonzero(val_sp_max != 0, as_tuple=True)[0]
+    # print("The reserve columns are: ", cond)
+    sparse = sp[:, cond]
+    return {'sparse': sparse}
 
 def compute_norm(graph):
     degs = graph.in_degrees().float().clamp(min=1)
@@ -130,6 +136,9 @@ def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=Fa
             edge_sparse = transform_edge_feature_to_sparse3(graph.edata['feat'], graph, int(sparse_encoder.split("_")[-1]))
         else:
             edge_sparse = transform_edge_feature_to_sparse(graph.edata['feat'], graph)
+
+        if len(sparse_encoder) > 0 and sparse_encoder.find("rm") != -1:
+            graph.apply_nodes(remove_nonsense_sparse_fea)
 
         if len(sparse_encoder) > 0 and sparse_encoder.find("edge_reverse") != -1:
             graph.edata.update({"feat": edge_sparse})
