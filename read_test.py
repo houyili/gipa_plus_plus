@@ -7,6 +7,7 @@ dataset = "ogbn-proteins"
 
 graph, labels, train_idx, val_idx, test_idx, evaluator = load_data(dataset, root_path)
 
+print(test_idx)
 # graph, labels = preprocess(graph, labels, sparse_encoder="count_30")
 graph, labels = preprocess(graph, labels, sparse_encoder="hard_30")
 
