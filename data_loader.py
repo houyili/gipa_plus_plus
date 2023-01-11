@@ -86,7 +86,8 @@ def transform_edge_feature_to_sparse3(raw_edge_fea, graph, split_num:int = 30):
     print("Sparse feature size: ", sparse.size(), " sparse count size: ", sparse_count.size())
     graph.edata.update({"sparse": sparse, "count": sparse_count})
     graph.update_all(fn.copy_e("count", "count_c"), fn.sum("count_c", "count"))
-    graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.mean("sparse_c", "sparse"))
+    graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.mean("sparse_c", "sparse_f"))
+    graph.apply_node(lambda nodes: {'sparse' : torch.concat(nodes.data['count'], nodes.data['sparse'])})
     del graph.edata["count"]
     return sparse
 
