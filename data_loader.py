@@ -3,7 +3,7 @@ import dgl.function as fn
 from torch.nn import functional
 from ogb.nodeproppred import DglNodePropPredDataset, Evaluator
 
-def transform_edge_feature_to_sparse(raw_edge_fea, split_num:int = 30):
+def transform_edge_feature_to_sparse(raw_edge_fea, graph, split_num:int = 30):
     edge_fea_list = []
     for i in range(8):
         print("Process edge feature == %d " %i)
@@ -25,9 +25,11 @@ def transform_edge_feature_to_sparse(raw_edge_fea, split_num:int = 30):
             edge_fea_list.append(one_hot * torch.reshape(possible, [-1, 1]))
     sparse = torch.concat(edge_fea_list, dim=-1)
     print(sparse.size())
+    graph.edata.update({"sparse": sparse})
+    graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.sum("sparse_c", "sparse"))
     return sparse
 
-def transform_edge_feature_to_sparse2(raw_edge_fea, split_num:int = 30):
+def transform_edge_feature_to_sparse2(raw_edge_fea, graph, split_num:int = 30):
     edge_fea_list = []
     for i in range(8):
         print("Process edge feature == %d " %i)
@@ -47,32 +49,45 @@ def transform_edge_feature_to_sparse2(raw_edge_fea, split_num:int = 30):
             edge_fea_list.append(one_hot * this_fea)
     sparse = torch.concat(edge_fea_list, dim=-1)
     print(sparse.size())
+    graph.edata.update({"sparse": sparse})
+    graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.sum("sparse_c", "sparse"))
     return sparse
 
-def transform_edge_feature_to_sparse3(raw_edge_fea, split_num:int = 30):
-    edge_fea_list = []
+def transform_edge_feature_to_sparse3(raw_edge_fea, graph, split_num:int = 30):
+    edge_count_list, edge_fea_list = list(), list()
     for i in range(8):
         print("Process edge feature == %d " %i)
         print("The edge feature size ", raw_edge_fea[:, i].size())
+        this_fea = torch.reshape(raw_edge_fea[:, i], [-1, 1])
+        print("The edge feature size ", raw_edge_fea[:, i].size(), " transform to ", this_fea.size())
         if i == 0:
             for value in [0.0010, 0.5010]:
                 res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
-                edge_fea_list.append(res)
+                edge_count_list.append(res)
+                edge_fea_list.append(res * this_fea)
         elif i == 6:
             for value in [0.0010, 0.9010, 0.6010, 0.6510, 0.5410]:
                 res = torch.reshape((raw_edge_fea[:, i] == value).float(), [-1, 1])
-                edge_fea_list.append(res)
+                edge_count_list.append(res)
+                edge_fea_list.append(res * this_fea)
         else:
-            edge_fea_list.append(torch.reshape((raw_edge_fea[:, i] == 0.0010).float(), [-1, 1]))
+            impossible = torch.reshape((raw_edge_fea[:, i] == 0.0010).float(), [-1, 1])
+            edge_count_list.append(impossible)
+            edge_fea_list.append(impossible * this_fea)
+
             possible = (raw_edge_fea[:, i] != 0.0010).float()
-            print("The edge possible size ", possible.size())
             one_hot = functional.one_hot((raw_edge_fea[:, i] * split_num).long()).float()
             print("The edge one hot size ", one_hot.size())
+            edge_count_list.append(one_hot)
             edge_fea_list.append(one_hot * torch.reshape(possible, [-1, 1]))
+    sparse_count = torch.concat(edge_count_list, dim=-1)
     sparse = torch.concat(edge_fea_list, dim=-1)
-    print(sparse.size())
+    print("Sparse feature size: ", sparse.size(), " sparse count size: ", sparse_count.size())
+    graph.edata.update({"sparse": sparse, "count": sparse_count})
+    graph.update_all(fn.copy_e("count", "count_c"), fn.sum("count_c", "count"))
+    graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.mean("sparse_c", "sparse"))
+    del graph.edata["count"]
     return sparse
-
 
 def compute_norm(graph):
     degs = graph.in_degrees().float().clamp(min=1)
@@ -103,14 +118,14 @@ def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=Fa
 
     if sparse_encoder is not None:
         if len(sparse_encoder) > 0 and sparse_encoder.find("hard") != -1:
-            edge_sparse = transform_edge_feature_to_sparse2(graph.edata['feat'], int(sparse_encoder.split("_")[-1]))
+            edge_sparse = transform_edge_feature_to_sparse2(graph.edata['feat'], graph, int(sparse_encoder.split("_")[-1]))
         elif len(sparse_encoder) > 0 and sparse_encoder.find("count") != -1:
-            edge_sparse = transform_edge_feature_to_sparse3(graph.edata['feat'], int(sparse_encoder.split("_")[-1]))
+            edge_sparse = transform_edge_feature_to_sparse3(graph.edata['feat'], graph, int(sparse_encoder.split("_")[-1]))
         else:
-            edge_sparse = transform_edge_feature_to_sparse(graph.edata['feat'])
-        graph.edata.update({"sparse": edge_sparse})
-        graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.sum("sparse_c", "sparse"))
-        if sparse_encoder.find("edge_reverse") != -1:
+            edge_sparse = transform_edge_feature_to_sparse(graph.edata['feat'], graph)
+
+
+        if len(sparse_encoder) > 0 and sparse_encoder.find("edge_reverse") != -1:
             graph.edata.update({"feat": edge_sparse})
         del graph.edata["sparse"]
 
