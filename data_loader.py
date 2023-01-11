@@ -75,11 +75,12 @@ def transform_edge_feature_to_sparse3(raw_edge_fea, graph, split_num:int = 30):
             edge_count_list.append(impossible)
             edge_fea_list.append(impossible * this_fea)
 
-            possible = (raw_edge_fea[:, i] != 0.0010).float()
+            possible = torch.reshape((raw_edge_fea[:, i] != 0.0010).float(), [-1, 1])
             one_hot = functional.one_hot((raw_edge_fea[:, i] * split_num).long()).float()
             print("The edge one hot size ", one_hot.size())
             edge_count_list.append(one_hot * possible)
-            edge_fea_list.append(one_hot * torch.reshape(possible, [-1, 1]))
+            edge_fea_list.append(one_hot * possible)
+
     sparse_count = torch.concat(edge_count_list, dim=-1)
     sparse = torch.concat(edge_fea_list, dim=-1)
     print("Sparse feature size: ", sparse.size(), " sparse count size: ", sparse_count.size())
