@@ -93,9 +93,9 @@ def transform_edge_feature_to_sparse3(raw_edge_fea, graph, split_num:int = 30):
     del graph.ndata["sparse_f"]
     return sparse
 
-def remove_nonsense_sparse_fea(node):
-    sp = node["sparse"]
-    val_sp = node["sparse"][107855:]
+def remove_nonsense_sparse_fea(nodes):
+    sp = nodes.data["sparse"]
+    val_sp = sp[107855:]
     val_sp_max = torch.max(val_sp, dim=1).vaules
     cond = torch.nonzero(val_sp_max != 0, as_tuple=True)[0]
     # print("The reserve columns are: ", cond)
