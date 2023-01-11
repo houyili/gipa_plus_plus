@@ -9,7 +9,8 @@ graph, labels, train_idx, val_idx, test_idx, evaluator = load_data(dataset, root
 
 print(test_idx.shape)
 # graph, labels = preprocess(graph, labels, sparse_encoder="count_30")
-graph, labels = preprocess(graph, labels, sparse_encoder="hard_rm_10")
+graph, labels = preprocess(graph, labels, sparse_encoder="hard_6")
+graph, labels = preprocess(graph, labels, sparse_encoder="hard_rm_6")
 
 for id in [train_idx, val_idx, test_idx]:
     sparse = torch.mean(graph.ndata["sparse"][id], dim=0).tolist()

@@ -99,7 +99,7 @@ def remove_nonsense_sparse_fea(nodes):
     val_sp_max = torch.max(val_sp, dim=0).values
     cond = torch.nonzero(val_sp_max != 0, as_tuple=True)[0]
     # print("The reserve columns are: ", cond)
-    sparse = sp[:, cond]
+    sparse = torch.concat([sp[:, cond], nodes.data["feat"]], dim=-1)
     return {'sparse': sparse}
 
 def compute_norm(graph):
