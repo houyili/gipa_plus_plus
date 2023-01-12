@@ -14,14 +14,11 @@ print(test_idx.shape)
 graph, labels = preprocess(graph, labels, sparse_encoder="hard_test_30")
 
 max_all = torch.max(graph.ndata["sparse_max"], dim=0).values.tolist()
-print(max_all.shape)
+print(len(max_all))
 min_all = torch.min(graph.ndata["sparse_min"], dim=0).values.tolist()
-print(min_all.shape)
 
 # max_all = torch.max(graph.edata["sparse"], dim=0).values.tolist()
-# print(max_all.shape)
 # min_all = torch.min(graph.edata["sparse"], dim=0).values.tolist()
-# print(min_all.shape)
 
 str1, str2 = "", ""
 for i in range(len(max_all)):
