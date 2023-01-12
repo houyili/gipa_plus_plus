@@ -11,7 +11,7 @@ print(test_idx.shape)
 # graph, labels = preprocess(graph, labels, sparse_encoder="count_30")
 # graph, labels = preprocess(graph, labels, sparse_encoder="hard_6")
 # graph, labels = preprocess(graph, labels, sparse_encoder="hard_30")
-graph, labels = preprocess(graph, labels, sparse_encoder="hard_test_30")
+graph, labels = preprocess(graph, labels, sparse_encoder="hard_test_100")
 
 max_all = torch.max(graph.ndata["sparse_max"], dim=0).values.tolist()
 print(len(max_all))
