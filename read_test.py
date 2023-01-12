@@ -10,10 +10,19 @@ graph, labels, train_idx, val_idx, test_idx, evaluator = load_data(dataset, root
 print(test_idx.shape)
 # graph, labels = preprocess(graph, labels, sparse_encoder="count_30")
 # graph, labels = preprocess(graph, labels, sparse_encoder="hard_6")
-graph, labels = preprocess(graph, labels, sparse_encoder="hard_30")
+# graph, labels = preprocess(graph, labels, sparse_encoder="hard_30")
+graph, labels = preprocess(graph, labels, sparse_encoder="hard_test_30")
 
-max_all = torch.max(graph.edata["sparse"], dim=0).values.tolist()
-min_all = torch.min(graph.edata["sparse"], dim=0).values.tolist()
+max_all = torch.max(graph.ndata["sparse_max"], dim=0).values.tolist()
+print(max_all.shape)
+min_all = torch.min(graph.ndata["sparse_min"], dim=0).values.tolist()
+print(min_all.shape)
+
+# max_all = torch.max(graph.edata["sparse"], dim=0).values.tolist()
+# print(max_all.shape)
+# min_all = torch.min(graph.edata["sparse"], dim=0).values.tolist()
+# print(min_all.shape)
+
 str1, str2 = "", ""
 for i in range(len(max_all)):
     str1 = str1 + "%.03f, " %max_all[i]

@@ -3,6 +3,12 @@ import dgl.function as fn
 from torch.nn import functional
 from ogb.nodeproppred import DglNodePropPredDataset, Evaluator
 
+def count_edge_feature_distribution(raw_edge_fea, graph, split_num:int = 30):
+    sparse = transform_edge_feature_to_sparse2(raw_edge_fea, graph, split_num)
+    graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.max("sparse_c", "sparse_max"))
+    graph.update_all(fn.copy_e("sparse", "sparse_c"), fn.min("sparse_c", "sparse_min"))
+    return sparse
+
 def transform_edge_feature_to_sparse(raw_edge_fea, graph, split_num:int = 30):
     edge_fea_list = []
     for i in range(8):
@@ -136,7 +142,10 @@ def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=Fa
 
     if sparse_encoder is not None:
         if len(sparse_encoder) > 0 and sparse_encoder.find("hard") != -1:
-            edge_sparse = transform_edge_feature_to_sparse2(graph.edata['feat'], graph, int(sparse_encoder.split("_")[-1]))
+            if sparse_encoder.find("test") > -1:
+                edge_sparse = count_edge_feature_distribution(graph.edata['feat'], graph, int(sparse_encoder.split("_")[-1]))
+            else:
+                edge_sparse = transform_edge_feature_to_sparse2(graph.edata['feat'], graph, int(sparse_encoder.split("_")[-1]))
         elif len(sparse_encoder) > 0 and sparse_encoder.find("count") != -1:
             edge_sparse = transform_edge_feature_to_sparse3(graph.edata['feat'], graph, int(sparse_encoder.split("_")[-1]))
         else:
@@ -150,7 +159,7 @@ def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=Fa
 
         if len(sparse_encoder) > 0 and sparse_encoder.find("edge_reverse") != -1:
             graph.edata.update({"feat": edge_sparse})
-        # del graph.edata["sparse"]
+        del graph.edata["sparse"]
 
     if user_adj or user_avg:
         deg_sqrt, deg_isqrt = compute_norm(graph)
