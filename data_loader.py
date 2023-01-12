@@ -150,7 +150,7 @@ def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=Fa
 
         if len(sparse_encoder) > 0 and sparse_encoder.find("edge_reverse") != -1:
             graph.edata.update({"feat": edge_sparse})
-        del graph.edata["sparse"]
+        # del graph.edata["sparse"]
 
     if user_adj or user_avg:
         deg_sqrt, deg_isqrt = compute_norm(graph)

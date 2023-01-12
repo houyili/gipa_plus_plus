@@ -12,8 +12,8 @@ print(test_idx.shape)
 # graph, labels = preprocess(graph, labels, sparse_encoder="hard_6")
 graph, labels = preprocess(graph, labels, sparse_encoder="hard_30")
 
-max_all = torch.max(graph.ndata["sparse"], dim=0).values.tolist()
-min_all = torch.min(graph.ndata["sparse"], dim=0).values.tolist()
+max_all = torch.max(graph.edata["sparse"], dim=0).values.tolist()
+min_all = torch.min(graph.edata["sparse"], dim=0).values.tolist()
 str1, str2 = "", ""
 for i in range(len(max_all)):
     str1 = str1 + "%.03f, " %max_all[i]
