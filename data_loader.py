@@ -93,12 +93,17 @@ def transform_edge_feature_to_sparse3(raw_edge_fea, graph, split_num:int = 30):
     del graph.ndata["sparse_f"]
     return sparse
 
+def remove_nonsense_sparse_fea_only(nodes):
+    sp = nodes.data["sparse"]
+    val_sp_max = torch.max(sp[107855:], dim=0).values
+    cond = torch.nonzero(val_sp_max != 0, as_tuple=True)[0]
+    return {'sparse': sp[:, cond]}
+
 def remove_nonsense_sparse_fea(nodes):
     sp = nodes.data["sparse"]
     val_sp = sp[107855:]
     val_sp_max = torch.max(val_sp, dim=0).values
     cond = torch.nonzero(val_sp_max != 0, as_tuple=True)[0]
-    # print("The reserve columns are: ", cond)
     sparse = torch.concat([sp[:, cond], nodes.data["feat"]], dim=-1)
     return {'sparse': sparse}
 
@@ -138,7 +143,10 @@ def preprocess(graph, labels, edge_agg_as_feat=True, user_adj=False, user_avg=Fa
             edge_sparse = transform_edge_feature_to_sparse(graph.edata['feat'], graph)
 
         if len(sparse_encoder) > 0 and sparse_encoder.find("rm") != -1:
-            graph.apply_nodes(remove_nonsense_sparse_fea)
+            if sparse_encoder.find("rmo") > -1:
+                graph.apply_nodes(remove_nonsense_sparse_fea_only)
+            else:
+                graph.apply_nodes(remove_nonsense_sparse_fea)
 
         if len(sparse_encoder) > 0 and sparse_encoder.find("edge_reverse") != -1:
             graph.edata.update({"feat": edge_sparse})
